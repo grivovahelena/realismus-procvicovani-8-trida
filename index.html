@@ -459,7 +459,7 @@ function startSpojovacka(){
 }
 function renderSpoj(rightLabel){
   let h=`<div class="panel"><h2 class="section-h">🔗 Spojovačka</h2>
-  <p class="small center">Klikni na autora vlevo a pak na správnou odpověď vpravo. (${spDone}/${spTotal})</p>
+  <p class="small center">Klikni na autora vlevo a pak na správnou odpověď vpravo. (<span id="spCount">${spDone}</span>/${spTotal})</p>
   <div class="match-cols">
     <div class="match-col"><div class="col-label">Autor</div>`;
   h+=spLeft.map((it,i)=>`<button class="match-item" id="L${i}" onclick="spClickLeft(${i})">${esc(it.label)}</button>`).join('');
@@ -482,6 +482,7 @@ function spClickRight(j){
   const fb=$('spfb');
   if(L.key===R.key){
     L.matched=true;R.matched=true;spDone++;
+    var spc=$('spCount');if(spc)spc.textContent=spDone;
     $('L'+spSel).classList.remove('sel');$('L'+spSel).classList.add('done');
     $('R'+j).classList.add('done');
     fb.textContent='✅ Sedí!';fb.style.color='var(--good)';
