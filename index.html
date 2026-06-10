@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Realismus – procvičování (8. třída)</title>
+<style>
+  :root{
+    --bg1:#fef6e4; --bg2:#e0f7fa;
+    --card:#ffffff; --ink:#2b2d42; --muted:#6b7280;
+    --p1:#6c5ce7; --p2:#00b894; --p3:#fd79a8; --p4:#fdcb6e; --p5:#0984e3; --p6:#e17055;
+    --good:#27ae60; --bad:#e74c3c; --shadow:0 8px 22px rgba(0,0,0,.12);
+    --radius:20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    background-attachment:fixed;
+    min-height:100vh;
+    line-height:1.5;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:16px 16px 60px;}
+  header h1{font-size:1.7rem;margin:.2em 0 .1em;text-align:center;}
+  header p.sub{text-align:center;color:var(--muted);margin:0 0 14px;font-weight:600;}
+  .topbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  .btn-back{
+    background:#fff;color:var(--ink);border:2px solid #e5e7eb;border-radius:999px;
+    padding:8px 16px;font-weight:700;font-size:.95rem;box-shadow:var(--shadow);
+  }
+  .btn-back:hover{background:#f3f4f6;}
+
+  /* MENU */
+  .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:8px;}
+  .menu-card{
+    border-radius:var(--radius);padding:22px 18px;color:#fff;text-align:left;
+    box-shadow:var(--shadow);transition:transform .12s ease;min-height:118px;
+    display:flex;flex-direction:column;gap:6px;
+  }
+  .menu-card:hover{transform:translateY(-4px) scale(1.01);}
+  .menu-card .ico{font-size:2.1rem;}
+  .menu-card .ttl{font-size:1.25rem;font-weight:800;}
+  .menu-card .dsc{font-size:.92rem;opacity:.95;font-weight:500;}
+  .c1{background:linear-gradient(135deg,#6c5ce7,#a29bfe);}
+  .c2{background:linear-gradient(135deg,#00b894,#55efc4);}
+  .c3{background:linear-gradient(135deg,#fd79a8,#fab1c8);}
+  .c4{background:linear-gradient(135deg,#e17055,#fab1a0);}
+  .c5{background:linear-gradient(135deg,#0984e3,#74b9ff);}
+  .c6{background:linear-gradient(135deg,#fdcb6e,#ffeaa7);color:#5b4500;}
+
+  .panel{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;margin-top:6px;}
+  h2.section-h{margin:.1em 0 .5em;font-size:1.5rem;}
+  .pill{display:inline-block;background:#eef2ff;color:#4338ca;border-radius:999px;padding:3px 12px;font-weight:700;font-size:.85rem;}
+
+  /* UCIVO */
+  ul.body-list{padding-left:0;list-style:none;margin:10px 0;}
+  ul.body-list li{background:#f8fafc;border-left:5px solid var(--p1);border-radius:10px;padding:10px 14px;margin-bottom:8px;font-size:1rem;}
+  table.pr{width:100%;border-collapse:collapse;margin:14px 0;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  table.pr th,table.pr td{padding:10px 12px;text-align:left;font-size:.98rem;}
+  table.pr thead th{background:var(--p1);color:#fff;}
+  table.pr tbody tr:nth-child(even){background:#f8fafc;}
+  table.pr td:first-child{font-weight:700;}
+  .info-box{background:#fff7ed;border:2px dashed #fdba74;border-radius:14px;padding:14px;margin-top:14px;}
+  .info-box h3{margin:.1em 0 .3em;}
+
+  /* FLASHCARDS */
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;justify-content:center;}
+  .chip{background:#fff;border:2px solid #e5e7eb;border-radius:999px;padding:8px 16px;font-weight:700;}
+  .chip.active{background:var(--p1);color:#fff;border-color:var(--p1);}
+  .flashcard{
+    perspective:1400px;width:100%;max-width:520px;margin:0 auto;height:340px;cursor:pointer;
+  }
+  .fc-inner{position:relative;width:100%;height:100%;transition:transform .55s;transform-style:preserve-3d;}
+  .flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+  .fc-face{position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:22px;display:flex;flex-direction:column;overflow:auto;}
+  .fc-front{background:linear-gradient(135deg,#6c5ce7,#a29bfe);color:#fff;align-items:center;justify-content:center;text-align:center;gap:10px;}
+  .fc-front .name{font-size:1.7rem;font-weight:800;}
+  .fc-front .hint{opacity:.9;font-weight:600;}
+  .fc-back{background:#fff;transform:rotateY(180deg);}
+  .fc-back .name{font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+  .fc-back .meta{color:var(--muted);font-weight:700;margin-bottom:8px;}
+  .fc-back .chars{font-size:.96rem;margin-bottom:10px;}
+  .works{display:flex;flex-wrap:wrap;gap:6px;}
+  .work{background:#eef2ff;color:#4338ca;border-radius:8px;padding:4px 10px;font-size:.86rem;font-weight:700;}
+  .nav-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:16px;}
+  .nav-btn{background:var(--p1);color:#fff;border-radius:999px;width:54px;height:54px;font-size:1.5rem;font-weight:800;box-shadow:var(--shadow);}
+  .nav-btn:disabled{opacity:.35;}
+  .counter{font-weight:800;color:var(--muted);min-width:64px;text-align:center;}
+
+  /* QUIZ */
+  .q-progress{font-weight:800;color:var(--muted);margin-bottom:6px;}
+  .q-text{font-size:1.25rem;font-weight:800;margin:6px 0 16px;}
+  .opts{display:grid;gap:10px;}
+  .opt{background:#fff;border:3px solid #e5e7eb;border-radius:14px;padding:14px 16px;font-size:1.05rem;font-weight:700;text-align:left;transition:.1s;}
+  .opt:hover:not(:disabled){border-color:var(--p1);transform:translateX(3px);}
+  .opt.correct{background:#eafaf0;border-color:var(--good);color:var(--good);}
+  .opt.wrong{background:#fdedec;border-color:var(--bad);color:var(--bad);}
+  .opt:disabled{cursor:default;}
+  .feedback{margin-top:14px;font-weight:800;font-size:1.05rem;text-align:center;min-height:1.4em;}
+  .next-btn{background:var(--p2);color:#fff;border-radius:999px;padding:12px 26px;font-size:1.05rem;font-weight:800;box-shadow:var(--shadow);display:block;margin:16px auto 0;}
+  .result{text-align:center;padding:10px;}
+  .result .big{font-size:3rem;font-weight:900;}
+  .result .emoji{font-size:4rem;}
+  .scorebar{height:18px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin:14px 0;}
+  .scorebar > div{height:100%;background:linear-gradient(90deg,var(--p2),var(--p5));}
+
+  /* SPOJOVACKA */
+  .match-cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .match-col{display:flex;flex-direction:column;gap:10px;}
+  .match-item{background:#fff;border:3px solid #e5e7eb;border-radius:12px;padding:12px;font-weight:700;text-align:center;font-size:.98rem;}
+  .match-item.sel{border-color:var(--p1);background:#eef2ff;}
+  .match-item.done{background:#eafaf0;border-color:var(--good);color:var(--good);cursor:default;opacity:.75;}
+  .match-item.bump{animation:bump .3s;}
+  @keyframes bump{50%{transform:scale(1.06);}}
+  .col-label{font-weight:800;text-align:center;color:var(--muted);}
+
+  /* PEXESO */
+  .pex-grid{display:grid;gap:10px;}
+  .pex-card{aspect-ratio:1/1;border-radius:14px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);
+    color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;
+    font-weight:700;font-size:.82rem;box-shadow:var(--shadow);cursor:pointer;transition:.15s;}
+  .pex-card .q{font-size:1.8rem;}
+  .pex-card.up{background:#fff;color:var(--ink);border:3px solid var(--p1);}
+  .pex-card.matched{background:#eafaf0;color:var(--good);border:3px solid var(--good);cursor:default;}
+
+  /* GLOSSARY */
+  .glos{display:grid;gap:12px;}
+  .glos-item{background:#f8fafc;border-radius:14px;padding:14px 16px;border-left:6px solid var(--p3);}
+  .glos-item .term{font-weight:800;font-size:1.1rem;color:var(--p1);}
+  .center{text-align:center;}
+  .hidden{display:none;}
+  .small{font-size:.85rem;color:var(--muted);}
+  @media(max-width:520px){
+    .fc-front .name{font-size:1.4rem;}
+    .flashcard{height:380px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>📚 Realismus</h1>
+    <p class="sub">Procvičování pro 8. třídu • Český jazyk a literatura</p>
+  </header>
+
+  <div class="topbar hidden" id="topbar">
+    <button class="btn-back" onclick="goMenu()">← Hlavní menu</button>
+    <span class="pill" id="topPill"></span>
+  </div>
+
+  <!-- MENU -->
+  <div id="menu">
+    <div class="menu-grid">
+      <button class="menu-card c1" onclick="showUcivo()">
+        <span class="ico">📖</span><span class="ttl">Učivo</span>
+        <span class="dsc">Co je realismus, povídka × román, Májovci</span>
+      </button>
+      <button class="menu-card c6" onclick="showPojmy()">
+        <span class="ico">🔑</span><span class="ttl">Pojmy</span>
+        <span class="dsc">Slovníček důležitých pojmů</span>
+      </button>
+      <button class="menu-card c2" onclick="showKarty()">
+        <span class="ico">🃏</span><span class="ttl">Učební karty</span>
+        <span class="dsc">Otoč kartu a zopakuj si autory</span>
+      </button>
+      <button class="menu-card c3" onclick="startKviz()">
+        <span class="ico">❓</span><span class="ttl">Kvíz</span>
+        <span class="dsc">Otázky se 4 možnostmi + skóre</span>
+      </button>
+      <button class="menu-card c5" onclick="startSpojovacka()">
+        <span class="ico">🔗</span><span class="ttl">Spojovačka</span>
+        <span class="dsc">Spoj autora s dílem nebo zemí</span>
+      </button>
+      <button class="menu-card c4" onclick="startPexeso()">
+        <span class="ico">🧠</span><span class="ttl">Pexeso</span>
+        <span class="dsc">Najdi dvojice autor + dílo</span>
+      </button>
+    </div>
+    <p class="center small" style="margin-top:18px;">Vyber si režim a začni. Hodně štěstí u testu! ✨</p>
+  </div>
+
+  <!-- VIEWS -->
+  <div id="view-ucivo" class="hidden"></div>
+  <div id="view-pojmy" class="hidden"></div>
+  <div id="view-karty" class="hidden"></div>
+  <div id="view-kviz" class="hidden"></div>
+  <div id="view-spojovacka" class="hidden"></div>
+  <div id="view-pexeso" class="hidden"></div>
+</div>
+
+<script>
+/* ====================== DATA ====================== */
+const DATA = {
+  "meta": {"tema":"Realismus ve světové a české literatuře","rocnik":"8. třída"},
+  "charakteristika_realismu": {
+    "nazev":"Co je realismus",
+    "body":[
+      "Umělecký směr 2. poloviny 19. století, tvořil protiváhu k romantismu.",
+      "Ovlivnil ho rozvoj přírodních věd (objevy Darwina), technika a výsledky revoluce 1848.",
+      "Ve filozofii se prosadil pozitivismus: skutečné je jen to, co lze ověřit smysly a zkušeností.",
+      "Autoři chtěli věrně a objektivně zobrazovat každodenní život obyčejného člověka.",
+      "Autor stojí mimo děj (nevstupuje do něj, nehodnotí ho).",
+      "Hlavní hrdina byl člověk z různých společenských vrstev, který představoval určitý typ (typizace), nebyl výjimečný.",
+      "Autoři pečlivě popisovali prostředí a charakterizovali postavy.",
+      "Do řeči postav zapojovali hovorovou řeč, slang a nářečí, tím zvyšovali autentičnost textu.",
+      "Oblíbené žánry: román, povídka, drama.",
+      "Kritický realismus: autoři měli ještě otevřenější pohled na společnost a snažili se naznačit, jak řešit sociální konflikty."
+    ]
+  },
+  "pojmy":[
+    {"pojem":"Realismus","vysvetleni":"Umělecký směr usilující o věrné a objektivní zobrazení skutečnosti a každodenního života."},
+    {"pojem":"Kritický realismus","vysvetleni":"Stupeň realismu, kde autor ostře kritizuje společnost a hledá řešení jejích problémů."},
+    {"pojem":"Typizace","vysvetleni":"Postava představuje určitý lidský typ nebo společenskou vrstvu, ne výjimečného jedince."},
+    {"pojem":"Pozitivismus","vysvetleni":"Filozofie, podle níž je skutečné jen to, co lze ověřit smysly a zkušeností."},
+    {"pojem":"Fejeton","vysvetleni":"Krátký, vtipný publicistický útvar o zdánlivě nevýznamném tématu. Za zakladatele českého fejetonu je považován Jan Neruda."},
+    {"pojem":"Balada","vysvetleni":"Lyrickoepická báseň s pochmurným dějem a tragickým (špatným) koncem."},
+    {"pojem":"Romance","vysvetleni":"Lyrickoepická báseň, obvykle s milostným nebo radostným námětem a dobrým koncem."},
+    {"pojem":"Almanach","vysvetleni":"Sborník, sbírka textů více autorů vydaná společně (např. almanach Máj)."}
+  ],
+  "povidka_vs_roman":{
+    "nazev":"Povídka × Román",
+    "tabulka":[
+      {"hledisko":"Rozsah","povidka":"kratší","roman":"delší"},
+      {"hledisko":"Postavy","povidka":"méně postav","roman":"více postav"},
+      {"hledisko":"Děj","povidka":"jedna dějová linie","roman":"rozvětvený děj"},
+      {"hledisko":"Zápletka","povidka":"jednoduchá","roman":"více zápletek"}
+    ]
+  },
+  "smery_ceske":[
+    {"nazev":"Májovci","rok":"almanach Máj 1858",
+     "charakteristika":"Skupina spisovatelů, kteří roku 1858 vydali almanach Máj. Hlásili se k odkazu Karla Hynka Máchy a inspirovali se jeho dílem. Chtěli povznést českou literaturu a zaměřit ji na současnost.",
+     "predstavitele":["Jan Neruda","Vítězslav Hálek","Karolina Světlá","Jakub Arbes"]}
+  ],
+  "autori":[
+    {"jmeno":"Honoré de Balzac","zeme":"Francie","roky":"1799–1850","charakteristika":"Zakladatel realismu. Vytvořil rozsáhlý cyklus Lidská komedie (téměř 100 románů) zobrazující francouzskou společnost. Líčil měšťáckou dravost, touhu po moci a zisku.","dila":["Otec Goriot","Evženie Grandetová","Ztracené iluze","Lesk a bída kurtizán"]},
+    {"jmeno":"Gustave Flaubert","zeme":"Francie","roky":"1821–1880","charakteristika":"Mistr zobrazování lidských vášní a citových vztahů.","dila":["Paní Bovaryová","Citová výchova"]},
+    {"jmeno":"Guy de Maupassant","zeme":"Francie","roky":"1850–1893","charakteristika":"Mistr povídky a novely. Proslavil se převahou popisu a vypravování.","dila":["Kulička (povídka)","Miláček"]},
+    {"jmeno":"Charles Dickens","zeme":"Anglie","roky":"1812–1870","charakteristika":"Od 12 let pracoval v továrně, protože tatínek byl ve vězení kvůli dluhům. Posílal povídky do časopisů. Proslavil se romány, často s dětským hrdinou. Zobrazoval kruté dětství a špatné poměry v sirotčincích.","dila":["Oliver Twist","David Copperfield","Kronika Pickwickova klubu","Malá Dorritka"]},
+    {"jmeno":"Jules Verne","zeme":"Francie","roky":"1828–1905","charakteristika":"Zakladatel vědeckofantastické literatury (sci-fi). Ve svých dílech předpověděl ponorky, kosmické lety i skafandry. Jeho dobrodružné romány se nazývají verneovky.","dila":["20 000 mil pod mořem","Dva roky prázdnin","Cesta kolem světa za 80 dní","Pět neděl v baloně"]},
+    {"jmeno":"Herbert George Wells","zeme":"Anglie","roky":"1866–1946","charakteristika":"Spolu s Vernem zakladatel sci-fi. Psal na počátku 20. století.","dila":["Stroj času","Válka světů"]},
+    {"jmeno":"Arthur Conan Doyle","zeme":"Anglie","roky":"1859–1930","charakteristika":"Narodil se ve skotském Edinburghu. Lékař a soudní lékař, který začal psát detektivní romány. Vytvořil postavu detektiva Sherlocka Holmese a jeho pomocníka doktora Watsona. Napsal 56 povídek a 4 romány se Sherlockem.","dila":["Pes baskervillský"]},
+    {"jmeno":"Hans Christian Andersen","zeme":"Dánsko","roky":"1805–1875","charakteristika":"Pocházel z chudých poměrů, už jako malý musel pracovat. Sám se nepovažoval za pohádkáře, toužil být básníkem. Většina jeho pohádek má smutný konec. Tvůrce moderní autorské pohádky.","dila":["Cínový vojáček","Císařovy nové šaty","Malá mořská víla","Ošklivé káčátko","Sněhová královna","Děvčátko se sirkami"]},
+    {"jmeno":"Mark Twain (Samuel Clemens)","zeme":"USA","roky":"1835–1910","charakteristika":"Pracoval jako tiskař, novinář a kormidelník na řece Mississippi. Byl úspěšný, ale neuměl hospodařit s penězi a nakonec zbankrotoval. Píše o dobrodružstvích a kamarádství dětí.","dila":["Dobrodružství Toma Sawyera","Dobrodružství Huckleberryho Finna"]},
+    {"jmeno":"Henryk Sienkiewicz","zeme":"Polsko","roky":"1846–1916","charakteristika":"Pocházel ze šlechtické rodiny, vystudoval historii. Pracoval jako novinář a psal historické romány. V roce 1905 získal Nobelovu cenu za literaturu.","dila":["Ohněm a mečem","Potopa","Pan Wolodyjowski"]},
+    {"jmeno":"Nikolaj Vasiljevič Gogol","zeme":"Rusko","roky":"1809–1852","charakteristika":"Pocházel z Ukrajiny, nakonec pracoval jako úředník. Zpočátku psal romanticky, vrcholná díla jsou realistická. Kritizuje úplatkářství a hloupost.","dila":["Mrtvé duše","Revizor (komedie)"]},
+    {"jmeno":"Fjodor Michajlovič Dostojevskij","zeme":"Rusko","roky":"1821–1881","charakteristika":"Byl odsouzen k trestu smrti, ten mu byl zmírněn na nucené práce na Sibiři. Zkušenost z vězení ovlivnila jeho díla. Považován za zakladatele ruského psychologického románu.","dila":["Zločin a trest","Idiot","Bratři Karamazovi","Zápisky z Mrtvého domu"]},
+    {"jmeno":"Lev Nikolajevič Tolstoj","zeme":"Rusko","roky":"1828–1910","charakteristika":"Velký ruský realista, pocházel ze šlechtické rodiny. Mistr v popisu charakteru a psychologie postav. Zobrazoval ruskou společnost 19. století.","dila":["Vojna a mír","Anna Karenina"]},
+    {"jmeno":"Božena Němcová","zeme":"Čechy","roky":"1820–1862","charakteristika":"Ve 40. letech se dostala do Prahy a poznala vlasteneckou společnost. Manželství měla nešťastné, neuměla hospodařit s penězi a odstěhovala se od manžela. Sbírala pohádky a vytvářela příběhy se sebevědomými ženami. Tvoří přechod mezi romantismem a realismem.","dila":["Babička","Divá Bára","Sedmero krkavců","Chytrá horákyně"]},
+    {"jmeno":"Karel Havlíček Borovský","zeme":"Čechy","roky":"1821–1856","charakteristika":"Narodil se v rodině kupce v Borové (odtud přízvisko Borovský). Novinář, v roce 1848 začal vydávat Národní noviny. Po revoluci byl pronásledován a 4 roky internován (nucený pobyt) v tyrolském Brixenu. Psal satiru a kritiku.","dila":["Tyrolské elegie","Král Lávra","Křest svatého Vladimíra","Epigramy"]},
+    {"jmeno":"Jan Neruda","zeme":"Čechy","roky":"1834–1891","charakteristika":"Největší osobnost Májovců. Básník, prozaik a novinář, považován za zakladatele českého fejetonu. Většinu života prožil na Malé Straně, nikdy se neoženil. První sbírka Hřbitovní kvítí měla pesimistický ráz a neměla úspěch, sbírka Písně kosmické je naopak optimistická.","dila":["Povídky malostranské","Hřbitovní kvítí","Knihy veršů","Písně kosmické","Balady a romance"]}
+  ]
+};
+const CESKE = ["Čechy"];
+function isCzech(a){return CESKE.includes(a.zeme);}
+
+/* ====================== HELPERS ====================== */
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function pick(arr,n){return shuffle(arr).slice(0,n);}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const $=id=>document.getElementById(id);
+const VIEWS=["menu","view-ucivo","view-pojmy","view-karty","view-kviz","view-spojovacka","view-pexeso"];
+function show(viewId,pill){
+  VIEWS.forEach(v=>$(v).classList.add('hidden'));
+  $(viewId).classList.remove('hidden');
+  const tb=$('topbar');
+  if(viewId==='menu'){tb.classList.add('hidden');}
+  else{tb.classList.remove('hidden');$('topPill').textContent=pill||'';}
+  window.scrollTo(0,0);
+}
+function goMenu(){show('menu');}
+
+/* ====================== UČIVO ====================== */
+function showUcivo(){
+  const c=DATA.charakteristika_realismu;
+  const t=DATA.povidka_vs_roman;
+  const m=DATA.smery_ceske[0];
+  let h=`<div class="panel"><h2 class="section-h">📖 ${esc(c.nazev)}</h2>`;
+  h+=`<ul class="body-list">`+c.body.map(b=>`<li>${esc(b)}</li>`).join('')+`</ul>`;
+  h+=`<h2 class="section-h">📏 ${esc(t.nazev)}</h2>`;
+  h+=`<table class="pr"><thead><tr><th>Hledisko</th><th>Povídka</th><th>Román</th></tr></thead><tbody>`;
+  h+=t.tabulka.map(r=>`<tr><td>${esc(r.hledisko)}</td><td>${esc(r.povidka)}</td><td>${esc(r.roman)}</td></tr>`).join('');
+  h+=`</tbody></table>`;
+  h+=`<div class="info-box"><h3>🇨🇿 ${esc(m.nazev)} <span class="small">(${esc(m.rok)})</span></h3>`;
+  h+=`<p>${esc(m.charakteristika)}</p>`;
+  h+=`<p><strong>Představitelé:</strong> ${m.predstavitele.map(esc).join(', ')}</p></div>`;
+  h+=`</div>`;
+  $('view-ucivo').innerHTML=h;
+  show('view-ucivo','Učivo');
+}
+
+/* ====================== POJMY ====================== */
+function showPojmy(){
+  let h=`<div class="panel"><h2 class="section-h">🔑 Slovníček pojmů</h2><div class="glos">`;
+  h+=DATA.pojmy.map(p=>`<div class="glos-item"><div class="term">${esc(p.pojem)}</div><div>${esc(p.vysvetleni)}</div></div>`).join('');
+  h+=`</div></div>`;
+  $('view-pojmy').innerHTML=h;
+  show('view-pojmy','Pojmy');
+}
+
+/* ====================== UČEBNÍ KARTY ====================== */
+let kFilter='all', kIndex=0, kList=[];
+function buildKList(){
+  if(kFilter==='cz') kList=DATA.autori.filter(isCzech);
+  else if(kFilter==='world') kList=DATA.autori.filter(a=>!isCzech(a));
+  else kList=DATA.autori.slice();
+}
+function showKarty(){
+  kFilter='all';kIndex=0;buildKList();
+  $('view-karty').innerHTML=`
+    <div class="filters">
+      <button class="chip" data-f="world" onclick="setFilter('world')">🌍 Světoví</button>
+      <button class="chip" data-f="cz" onclick="setFilter('cz')">🇨🇿 Čeští</button>
+      <button class="chip active" data-f="all" onclick="setFilter('all')">📚 Všichni</button>
+    </div>
+    <div class="flashcard" id="fcard" onclick="flipCard()"><div class="fc-inner" id="fcInner"></div></div>
+    <div class="nav-row">
+      <button class="nav-btn" id="prevBtn" onclick="event.stopPropagation();kStep(-1)">‹</button>
+      <span class="counter" id="kCounter"></span>
+      <button class="nav-btn" id="nextBtn" onclick="event.stopPropagation();kStep(1)">›</button>
+    </div>
+    <p class="center small">Klikni na kartu a otoč ji. 🔄</p>`;
+  renderCard();
+  show('view-karty','Učební karty');
+}
+function setFilter(f){
+  kFilter=f;kIndex=0;buildKList();
+  document.querySelectorAll('.chip').forEach(c=>c.classList.toggle('active',c.dataset.f===f));
+  renderCard();
+}
+function renderCard(){
+  const a=kList[kIndex];
+  const flag=isCzech(a)?'🇨🇿':'🌍';
+  $('fcInner').innerHTML=`
+    <div class="fc-face fc-front">
+      <span style="font-size:2.4rem">${flag}</span>
+      <span class="name">${esc(a.jmeno)}</span>
+      <span class="hint">Klikni a otoč →</span>
+    </div>
+    <div class="fc-face fc-back">
+      <div class="name">${esc(a.jmeno)}</div>
+      <div class="meta">${esc(a.zeme)} • ${esc(a.roky)}</div>
+      <div class="chars">${esc(a.charakteristika)}</div>
+      <div class="works">${a.dila.map(d=>`<span class="work">${esc(d)}</span>`).join('')}</div>
+    </div>`;
+  $('fcard').classList.remove('flipped');
+  $('kCounter').textContent=(kIndex+1)+' / '+kList.length;
+  $('prevBtn').disabled=kIndex===0;
+  $('nextBtn').disabled=kIndex===kList.length-1;
+}
+function flipCard(){$('fcard').classList.toggle('flipped');}
+function kStep(d){const n=kIndex+d;if(n<0||n>=kList.length)return;kIndex=n;renderCard();}
+
+/* ====================== KVÍZ ====================== */
+let quiz=[], qPos=0, qScore=0, answered=false;
+const QUIZ_LEN=10;
+function buildQuestionPool(){
+  const A=DATA.autori, pool=[];
+  // 1. Kdo napsal dílo X?
+  A.forEach(a=>{a.dila.forEach(d=>{
+    const others=pick(A.filter(x=>x.jmeno!==a.jmeno),3).map(x=>x.jmeno);
+    pool.push({q:`Kdo napsal dílo „${d}“?`,correct:a.jmeno,opts:shuffle([a.jmeno,...others])});
+  });});
+  // 2. Které dílo napsal autor X?
+  A.forEach(a=>{
+    const otherWorks=shuffle(A.filter(x=>x.jmeno!==a.jmeno).flatMap(x=>x.dila)).slice(0,3);
+    const corr=pick(a.dila,1)[0];
+    pool.push({q:`Které z těchto děl napsal ${a.jmeno}?`,correct:corr,opts:shuffle([corr,...otherWorks])});
+  });
+  // 3. Z které země pochází autor?
+  const zeme=[...new Set(A.map(a=>a.zeme))];
+  A.forEach(a=>{
+    const wrong=pick(zeme.filter(z=>z!==a.zeme),3);
+    pool.push({q:`Z které země pochází ${a.jmeno}?`,correct:a.zeme,opts:shuffle([a.zeme,...wrong])});
+  });
+  // 4. Roky autora
+  A.forEach(a=>{
+    const wrong=pick(A.filter(x=>x.jmeno!==a.jmeno).map(x=>x.roky),3);
+    pool.push({q:`Ve kterých letech žil ${a.jmeno}?`,correct:a.roky,opts:shuffle([a.roky,...wrong])});
+  });
+  // 5. Význam pojmu (který pojem odpovídá vysvětlení)
+  DATA.pojmy.forEach(p=>{
+    const wrong=pick(DATA.pojmy.filter(x=>x.pojem!==p.pojem).map(x=>x.pojem),3);
+    pool.push({q:`Který pojem znamená: „${p.vysvetleni}“`,correct:p.pojem,opts:shuffle([p.pojem,...wrong])});
+  });
+  return pool;
+}
+function startKviz(){
+  quiz=pick(buildQuestionPool(),QUIZ_LEN);qPos=0;qScore=0;
+  show('view-kviz','Kvíz');renderQuestion();
+}
+function renderQuestion(){
+  answered=false;
+  const q=quiz[qPos];
+  let h=`<div class="panel">
+    <div class="q-progress">Otázka ${qPos+1} / ${quiz.length} • Skóre: ${qScore}</div>
+    <div class="q-text">${esc(q.q)}</div>
+    <div class="opts" id="opts">`;
+  h+=q.opts.map(o=>`<button class="opt" onclick="answer(this,'${esc(o).replace(/'/g,"&#39;")}')">${esc(o)}</button>`).join('');
+  h+=`</div><div class="feedback" id="fb"></div></div>`;
+  $('view-kviz').innerHTML=h;
+}
+function answer(btn,choice){
+  if(answered)return;answered=true;
+  const q=quiz[qPos];
+  const correct=choice===q.correct;
+  if(correct)qScore++;
+  document.querySelectorAll('#opts .opt').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===q.correct)b.classList.add('correct');
+    else if(b===btn)b.classList.add('wrong');
+  });
+  const fb=$('fb');
+  fb.textContent=correct?'✅ Správně!':'❌ Špatně. Správně je: '+q.correct;
+  fb.style.color=correct?'var(--good)':'var(--bad)';
+  const last=qPos===quiz.length-1;
+  const b=document.createElement('button');
+  b.className='next-btn';b.textContent=last?'Vyhodnotit 🏁':'Další otázka →';
+  b.onclick=last?showResult:nextQuestion;
+  $('view-kviz').querySelector('.panel').appendChild(b);
+}
+function nextQuestion(){qPos++;renderQuestion();}
+function showResult(){
+  const pct=Math.round(qScore/quiz.length*100);
+  let emoji,msg;
+  if(pct>=90){emoji='🏆';msg='Skvělé! Test zvládneš levou zadní.';}
+  else if(pct>=70){emoji='🎉';msg='Moc dobře! Ještě pár detailů a je to.';}
+  else if(pct>=50){emoji='💪';msg='Dobrý základ, zkus to ještě jednou.';}
+  else{emoji='📚';msg='Zopakuj si učivo a karty a zkus to znovu.';}
+  $('view-kviz').innerHTML=`<div class="panel result">
+    <div class="emoji">${emoji}</div>
+    <div class="big">${qScore} / ${quiz.length}</div>
+    <div class="scorebar"><div style="width:${pct}%"></div></div>
+    <p style="font-weight:800;font-size:1.2rem">${pct} %</p>
+    <p>${msg}</p>
+    <button class="next-btn" onclick="startKviz()">🔄 Hrát znovu</button>
+    <button class="btn-back" style="margin-top:10px" onclick="goMenu()">← Hlavní menu</button>
+  </div>`;
+}
+
+/* ====================== SPOJOVAČKA ====================== */
+let spLeft=[], spRight=[], spSel=null, spDone=0, spTotal=0;
+function startSpojovacka(){
+  const mode=Math.random()<0.5?'dilo':'zeme';
+  const chosen=pick(DATA.autori,5);
+  spTotal=chosen.length;spDone=0;spSel=null;
+  spLeft=shuffle(chosen.map(a=>({key:a.jmeno,label:a.jmeno})));
+  if(mode==='dilo'){
+    spRight=shuffle(chosen.map(a=>({key:a.jmeno,label:pick(a.dila,1)[0]})));
+  }else{
+    spRight=shuffle(chosen.map(a=>({key:a.jmeno,label:a.zeme})));
+  }
+  $('view-spojovacka').dataset.label=mode==='dilo'?'dílo':'zemi';
+  renderSpoj(mode==='dilo'?'jeho dílem':'jeho zemí');
+  show('view-spojovacka','Spojovačka');
+}
+function renderSpoj(rightLabel){
+  let h=`<div class="panel"><h2 class="section-h">🔗 Spojovačka</h2>
+  <p class="small center">Klikni na autora vlevo a pak na správnou odpověď vpravo. (${spDone}/${spTotal})</p>
+  <div class="match-cols">
+    <div class="match-col"><div class="col-label">Autor</div>`;
+  h+=spLeft.map((it,i)=>`<button class="match-item" id="L${i}" onclick="spClickLeft(${i})">${esc(it.label)}</button>`).join('');
+  h+=`</div><div class="match-col"><div class="col-label">${esc(rightLabel)}</div>`;
+  h+=spRight.map((it,i)=>`<button class="match-item" id="R${i}" onclick="spClickRight(${i})">${esc(it.label)}</button>`).join('');
+  h+=`</div></div><div class="feedback" id="spfb"></div></div>`;
+  $('view-spojovacka').innerHTML=h;
+}
+function spClickLeft(i){
+  if(spLeft[i].matched)return;
+  spSel=i;
+  document.querySelectorAll('.match-col:first-child .match-item').forEach((el,idx)=>{
+    if(!spLeft[idx].matched)el.classList.toggle('sel',idx===i);
+  });
+}
+function spClickRight(j){
+  if(spRight[j].matched)return;
+  if(spSel===null){$('spfb').textContent='👈 Nejdřív vyber autora vlevo.';$('spfb').style.color='var(--muted)';return;}
+  const L=spLeft[spSel], R=spRight[j];
+  const fb=$('spfb');
+  if(L.key===R.key){
+    L.matched=true;R.matched=true;spDone++;
+    $('L'+spSel).classList.remove('sel');$('L'+spSel).classList.add('done');
+    $('R'+j).classList.add('done');
+    fb.textContent='✅ Sedí!';fb.style.color='var(--good)';
+    spSel=null;
+    if(spDone===spTotal){
+      fb.innerHTML=`🎉 Hotovo, všechno správně spojené!<br><button class="next-btn" onclick="startSpojovacka()">🔄 Nová spojovačka</button>`;
+    }
+  }else{
+    fb.textContent='❌ To k sobě nepatří, zkus to znovu.';fb.style.color='var(--bad)';
+    const el=$('R'+j);el.classList.add('bump');setTimeout(()=>el.classList.remove('bump'),300);
+  }
+}
+
+/* ====================== PEXESO ====================== */
+let pexCards=[], pexUp=[], pexMatched=0, pexLock=false, pexMoves=0;
+function startPexeso(){
+  const useAuthors=Math.random()<0.5;
+  let pairs=[];
+  if(useAuthors){
+    pick(DATA.autori,6).forEach(a=>{
+      pairs.push({pid:a.jmeno,text:a.jmeno,type:'a'});
+      pairs.push({pid:a.jmeno,text:pick(a.dila,1)[0],type:'b'});
+    });
+  }else{
+    pick(DATA.pojmy,6).forEach(p=>{
+      pairs.push({pid:p.pojem,text:p.pojem,type:'a'});
+      pairs.push({pid:p.pojem,text:p.vysvetleni,type:'b'});
+    });
+  }
+  pexCards=shuffle(pairs);pexUp=[];pexMatched=0;pexLock=false;pexMoves=0;
+  renderPexeso();
+  show('view-pexeso','Pexeso');
+}
+function renderPexeso(){
+  const cols=4;
+  let h=`<div class="panel"><h2 class="section-h">🧠 Pexeso</h2>
+  <p class="small center">Najdi dvojice, které k sobě patří. Tahy: <span id="pexMoves">0</span></p>
+  <div class="pex-grid" style="grid-template-columns:repeat(${cols},1fr)">`;
+  h+=pexCards.map((c,i)=>`<div class="pex-card" id="P${i}" onclick="pexFlip(${i})"><span class="q">❓</span></div>`).join('');
+  h+=`</div><div class="feedback" id="pexfb"></div></div>`;
+  $('view-pexeso').innerHTML=h;
+}
+function pexFlip(i){
+  if(pexLock)return;
+  const c=pexCards[i];const el=$('P'+i);
+  if(c.matched||el.classList.contains('up'))return;
+  el.classList.add('up');el.innerHTML=esc(c.text);
+  pexUp.push(i);
+  if(pexUp.length===2){
+    pexMoves++;$('pexMoves').textContent=pexMoves;
+    pexLock=true;
+    const [a,b]=pexUp;
+    if(pexCards[a].pid===pexCards[b].pid && a!==b){
+      setTimeout(()=>{
+        $('P'+a).classList.add('matched');$('P'+b).classList.add('matched');
+        pexCards[a].matched=true;pexCards[b].matched=true;
+        pexMatched++;pexUp=[];pexLock=false;
+        if(pexMatched===pexCards.length/2){
+          $('pexfb').innerHTML=`🎉 Výborně! Našel/a jsi všechny dvojice na ${pexMoves} tahů.<br><button class="next-btn" onclick="startPexeso()">🔄 Nové pexeso</button>`;
+          $('pexfb').style.color='var(--good)';
+        }
+      },420);
+    }else{
+      setTimeout(()=>{
+        $('P'+a).classList.remove('up');$('P'+a).innerHTML='<span class="q">❓</span>';
+        $('P'+b).classList.remove('up');$('P'+b).innerHTML='<span class="q">❓</span>';
+        pexUp=[];pexLock=false;
+      },800);
+    }
+  }
+}
+
+goMenu();
+</script>
+</body>
+</html>
